@@ -114,6 +114,10 @@ h1 {
   height: 3rem;
 }
 
+.label-posNums {
+  margin-top: 1rem;
+}
+
 .label-lives {
   margin-bottom: 2rem;
 }

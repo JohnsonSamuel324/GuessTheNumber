@@ -1,21 +1,13 @@
 'use strict';
 
-/*
-console.log(document.querySelector('.message').textContent)
-document.querySelector('.message').textContent = '🥳 Correct Number!'
-console.log(document.querySelector('.message').textContent)
-
-document.querySelector('.number').textContent = 13;
-document.querySelector('.score').textContent = 10
-
-document.querySelector('.guess').value = 23;
-console.log(document.querySelector('.guess').value);
-*/
+// DEFAULT VALUES
+let smallest = 1;
+let largest = 20;
+let posAnswers = "Possible: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20";
 let lives = 5;
 let score = 0;
 let highscore = 0;
 let secretNumber = Math.trunc(Math.random() * 20) + 1;
-// document.querySelector('.number').textContent = secretNumber;
 
 const displayMessage = function (message) {document.querySelector('.message').textContent = message};
 const displayNumber = function(color) {
@@ -36,17 +28,46 @@ const endGame = function ()
         document.querySelector('.highscore').textContent = highscore;
     }
 };
-const modifyLives = function (lives) { 
+const modifyLives = function (hearts) { 
+    lives = hearts;
     document.querySelector('.lives').textContent = lives;
 };
+const possibleAnswer = function (g, highorlow) {
+    posAnswers = "";
+
+    if (highorlow === 'high')
+    {
+        // if guess is smaller than the largest but is still too high
+        if (g < largest) {
+            largest = g;
+        }
+    }
+    else if (highorlow === 'low')
+    {
+        // if guess is too low
+        if (g > smallest) {
+            smallest = g + 1;
+        }
+    }
+
+    for (let i = smallest; i <= largest; i++)
+    {
+        posAnswers += i + ', ';
+    }
+        posAnswers = posAnswers.slice(0, -2);
+        document.querySelector('.label-posNums').textContent = 'Possible: ' + posAnswers;
+}
 const delay = ms => new Promise(res => setTimeout(res, ms));
-const reset = async (lives, score) =>  { 
+const reset = async (hearts, endScore) =>  { 
     await delay(3000);
     document.querySelector('body').style.backgroundColor = '#222';
     document.querySelector('.number').textContent = '?';
     document.querySelector('.number').style.width = '15rem';
-    modifyLives(lives);
-    setScore(score);
+    smallest = 1;
+    largest = 20;
+    document.querySelector('.label-posNums').textContent = "Possible: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20";
+    modifyLives(hearts);
+    setScore(endScore);
     secretNumber = Math.trunc(Math.random() * 20) + 1;
     displayMessage('Start guessing...');
     document.querySelector('.guess').value = '';
@@ -54,8 +75,19 @@ const reset = async (lives, score) =>  {
 const setScore = function (score) {
     document.querySelector('.score').textContent = score;
 };
-
-
+const wrongIndicator = async () => {
+    document.querySelector('.message').style.color = 'red';
+    await delay(125);
+    document.querySelector('.message').style.color = '#eee';
+    await delay(125);
+    document.querySelector('.message').style.color = 'red';
+    await delay(125);
+    document.querySelector('.message').style.color = '#eee';
+    await delay(125);
+    document.querySelector('.message').style.color = 'red';
+    await delay(125);
+    document.querySelector('.message').style.color = '#eee';
+}
 
 document.querySelector('.again').addEventListener('click', function() {
     // Resets game with (lives, score)
@@ -95,6 +127,8 @@ document.querySelector('.check').addEventListener('click', function() {
             if (guess > secretNumber)
             {
                 displayMessage('⬆️ Too High!');
+                wrongIndicator();
+                possibleAnswer(guess, "high");
                 lives--;
                 modifyLives(lives);
             }
@@ -102,6 +136,8 @@ document.querySelector('.check').addEventListener('click', function() {
             else if (guess < secretNumber)
             {
                 displayMessage('⬇️ Too Low!');
+                wrongIndicator();
+                possibleAnswer(guess, "low")
                 lives--;
                 modifyLives(lives);
             }
