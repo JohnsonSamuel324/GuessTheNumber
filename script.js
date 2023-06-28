@@ -39,7 +39,7 @@ const possibleAnswer = function (g, highorlow) {
     {
         // if guess is smaller than the largest but is still too high
         if (g < largest) {
-            largest = g;
+            largest = g - 1;
         }
     }
     else if (highorlow === 'low')
